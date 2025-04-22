@@ -1,0 +1,23 @@
+{
+  "name": "kinde-workflow-examples",
+  "version": "1.0.0",
+  "description": "Example JavaScript/TypeScript workflows for Kinde auth flow.",
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "kinde",
+    "auth",
+    "workflows",
+    "typescript"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@kinde/infrastructure": "^0.4.1"
+  }
+}
