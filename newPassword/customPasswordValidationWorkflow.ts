@@ -1,5 +1,5 @@
 import {
-  onExistingPasswordProvidedEvent,
+  onNewPasswordProvidedEvent,
   WorkflowSettings,
   WorkflowTrigger,
   invalidateFormField,
@@ -7,8 +7,8 @@ import {
 
 // The setting for this workflow
 export const workflowSettings: WorkflowSettings = {
-  id: "onExistingPasswordProvided",
-  trigger: WorkflowTrigger.ExistingPasswordProvided,
+  id: "onNewPasswordProvided",
+  trigger: WorkflowTrigger.NewPasswordProvided,
   failurePolicy: {
     action: "stop",
   },
@@ -18,7 +18,7 @@ export const workflowSettings: WorkflowSettings = {
 };
 
 // The workflow code to be executed when the event is triggered
-export default async function Workflow(event: onExistingPasswordProvidedEvent) {
+export default async function Workflow(event: onNewPasswordProvidedEvent) {
   const isMinCharacters = context.auth.Password.length >= 50;
 
   if (!isMinCharacters) {
