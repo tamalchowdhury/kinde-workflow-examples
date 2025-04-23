@@ -49,6 +49,10 @@ Each example includes:
 
 2. Use it as a starting point for your own workflows.
 
+## Base template
+
+If you're looking for somewhere to start then try out the [base workflow template](https://github.com/kinde-starter-kits/workflow-base-template)
+
 > 💡 Kinde runs workflows in a secure, isolated environment. All workflows should be deterministic and performant.
 
 📦 Requirements
