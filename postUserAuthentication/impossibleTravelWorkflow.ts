@@ -8,6 +8,11 @@ import {
   denyAccess,
 } from "@kinde/infrastructure";
 
+/**
+ * Required environment variables:
+ * - TRUSTPATH_API_KEY: Your TrustPath API key used for evaluating login risks.
+ */
+
 // Workflow settings
 export const workflowSettings: WorkflowSettings = {
   id: "impossibleTravelWorkflow",
