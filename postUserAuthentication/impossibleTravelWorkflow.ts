@@ -8,10 +8,22 @@ import {
   denyAccess,
 } from "@kinde/infrastructure";
 
-/**
- * Required environment variables:
- * - TRUSTPATH_API_KEY: Your TrustPath API key used for evaluating login risks.
- */
+
+// This workflow requires you to set up the Kinde management API
+// You can do this by going to the Kinde dashboard.
+//
+// Create an M2M application with the following scopes enabled:
+// * read:users
+//
+// In Settings -> Environment variables set up the following variables with the
+// values from the M2M application you created above:
+//
+// * KINDE_WF_M2M_CLIENT_ID
+// * KINDE_WF_M2M_CLIENT_SECRET - Ensure this is setup with sensitive flag
+// enabled to prevent accidental sharing
+//
+// You will also need the following variable set containing your TrustPath API key 
+// TRUSTPATH_API_KEY
 
 // Workflow settings
 export const workflowSettings: WorkflowSettings = {
