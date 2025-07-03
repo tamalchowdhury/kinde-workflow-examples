@@ -3,7 +3,7 @@ import {
   WorkflowSettings,
   WorkflowTrigger,
   denyAccess,
-  getEnvironmentVariable
+  getEnvironmentVariable,
 } from "@kinde/infrastructure";
 
 // The settings for this workflow
@@ -13,9 +13,10 @@ export const workflowSettings: WorkflowSettings = {
   failurePolicy: {
     action: "stop",
   },
-  trigger: WorkflowTrigger.UserPreRegistration,
+  trigger: "user:pre_registration",
   bindings: {
     "kinde.env": {},
+    "kinde.auth": {},
   },
 };
 
@@ -33,11 +34,42 @@ export const workflowSettings: WorkflowSettings = {
 // as it makes it harder to manage and update the list of disposable email domains.
 
 // The workflow code to be executed when the event is triggered
-export default async function handlePreRegistration(event: onUserPreRegistrationEvent) {
-  const disposableEmailDomains = getEnvironmentVariable("DISPOSABLE_EMAIL_DOMAINS")?.value;
-  const disposableEmailDomainsArray = disposableEmailDomains?.split(",");
+export default async function Workflow(
+  event: onUserPreRegistrationEvent
+) {
+  console.log("handlePreRegistration", event);
 
-  if (disposableEmailDomainsArray?.includes(event.context.user.email.split("@")[1])) {
-    denyAccess("Disposable email domain detected");
+  // Check if user email exists in the event
+  if (!event.context.user.email) {
+    console.log(
+      "No user email found in pre-registration event, allowing registration"
+    );
+    return;
+  }
+
+  const disposableEmailDomains = getEnvironmentVariable(
+    "DISPOSABLE_EMAIL_DOMAINS"
+  )?.value;
+
+  // If no disposable email domains are configured, allow registration
+  if (!disposableEmailDomains) {
+    console.log(
+      "No disposable email domains configured, allowing registration"
+    );
+
+    const disposableEmailDomainsArray = disposableEmailDomains
+      .split(",")
+      .map((domain) => domain.trim());
+
+    const userEmailDomain = event.context.user.email.split("@")[1];
+
+    if (disposableEmailDomainsArray.includes(userEmailDomain)) {
+      console.log(
+        `Blocking registration for disposable email domain: ${userEmailDomain}`
+      );
+      denyAccess("Disposable email domain detected");
+    } else {
+      console.log(`Allowing registration for email domain: ${userEmailDomain}`);
+    }
   }
 }
