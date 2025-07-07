@@ -8,7 +8,7 @@ import {
 // The setting for this workflow
 export const workflowSettings: WorkflowSettings = {
   id: "onUserPlanSelection",
-  trigger: WorkflowTrigger.UserPlanSelection,
+  trigger: WorkflowTrigger.PlanSelection,
   failurePolicy: {
     action: "stop",
   },
