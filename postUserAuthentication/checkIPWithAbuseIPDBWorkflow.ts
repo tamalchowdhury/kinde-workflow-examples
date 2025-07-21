@@ -146,9 +146,9 @@ function validateConfiguration() {
     throw new Error('Invalid ABUSEIPDB_BLOCK_THRESHOLD. Must be a number between 0 and 100.');
   }
 
-  // Validate API key format (AbuseIPDB keys are typically 64 characters)
-  if (!config.apiKey || config.apiKey.length < 10) {
-    throw new Error('Invalid ABUSEIPDB_API_KEY. API key appears to be too short or missing.');
+  // Validate API key format (AbuseIPDB keys are at least 64 characters, alphanumeric only)
+  if (!config.apiKey || config.apiKey.length < 64 || !/^[a-zA-Z0-9]+$/.test(config.apiKey)) {
+    throw new Error('Invalid ABUSEIPDB_API_KEY. API key must be at least 64 characters long and contain only letters and numbers.');
   }
 
   // Check for fail-open configuration
@@ -300,6 +300,16 @@ export default async function handlePostAuth(
         fetchedData = response;
       }
 
+      // Helper function to handle missing score
+      const handleMissingScore = () => {
+        if (config.failOpen) {
+          console.warn('Could not parse AbuseIPDB response or missing valid abuseConfidenceScore. Fail-open mode enabled - allowing access.');
+          return 0;
+        } else {
+          throw new Error('AbuseIPDB API response missing valid abuseConfidenceScore.');
+        }
+      };
+
       // Handle server errors gracefully
       if (fetchedData && fetchedData.message === 'Server Error') {
         if (config.failOpen) {
@@ -308,7 +318,7 @@ export default async function handlePostAuth(
         } else {
           throw new Error('AbuseIPDB API server error. Access blocked.');
         }
-      } else if (fetchedData && fetchedData.errors && fetchedData.errors.length > 0) {
+      } else if (fetchedData?.errors?.length > 0) {
         const apiErrors = fetchedData.errors.map((err: any) => err.detail || err.message).join(', ');
         if (config.failOpen) {
           console.warn(`AbuseIPDB API errors: ${apiErrors}. Fail-open mode enabled - allowing access.`);
@@ -346,20 +356,8 @@ export default async function handlePostAuth(
             config.cacheURL,
             config.cacheTokenWrite
           );
-        } else if (response.status >= 200 && response.status < 300) {
-          if (config.failOpen) {
-            console.warn('Could not parse AbuseIPDB response. Fail-open mode enabled - allowing access.');
-            abuseConfidenceScore = 0;
-          } else {
-            throw new Error('AbuseIPDB API response missing valid abuseConfidenceScore.');
-          }
         } else {
-          if (config.failOpen) {
-            console.warn('AbuseIPDB API response missing valid abuseConfidenceScore. Fail-open mode enabled - allowing access.');
-            abuseConfidenceScore = 0;
-          } else {
-            throw new Error('AbuseIPDB API response missing valid abuseConfidenceScore.');
-          }
+          abuseConfidenceScore = handleMissingScore();
         }
       }
     } catch (error) {
